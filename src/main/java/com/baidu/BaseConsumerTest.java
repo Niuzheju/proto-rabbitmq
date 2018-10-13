@@ -7,10 +7,14 @@ import org.junit.Before;
 
 import java.io.IOException;
 
+/**
+ * 消费者base类
+ */
 public class BaseConsumerTest {
 
     private Connection connection;
 
+    //信道,提供给子类操作rabbitmq
     protected Channel channel;
 
     @Before
@@ -19,6 +23,7 @@ public class BaseConsumerTest {
         channel = connection.createChannel();
     }
 
+    //测试结束关闭连接
     @After
     public void after(){
         try {

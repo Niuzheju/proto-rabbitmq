@@ -63,4 +63,18 @@ public class ProducerTestSendMessage extends BaseProducerTest {
                     , this.getClass().getMethod("test05").toString().getBytes());
         }
     }
+
+    /**
+     * topic类型交换器
+     */
+    @Test
+    public void test06() throws IOException {
+        String exchange_topic = "exchange_topic";
+        String queue001 = "queue001";
+        channel.exchangeDeclare(exchange_topic, "topic", false, true, null);
+        channel.queueDeclare(queue001, false, false, true, null);
+        channel.queueBind(queue001, exchange_topic, "*.niuzj.#");
+        channel.basicPublish(exchange_topic, "com.niuzj.test", null, "hello world".getBytes());
+
+    }
 }

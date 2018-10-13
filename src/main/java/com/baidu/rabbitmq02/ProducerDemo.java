@@ -9,6 +9,9 @@ import com.rabbitmq.client.MessageProperties;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * 测试创建默认队列
+ */
 public class ProducerDemo {
     private static final String EXCHANGE_NAME = "exchange_nzj";
 

@@ -81,7 +81,7 @@ public class TestConsumerMessage extends BaseConsumerTest {
                 }
             }
 
-            //最先被调用chul
+            //最先被调用
             @Override
             public void handleConsumeOk(String consumerTag) {
                 System.out.println("消费成功-->" + consumerTag);
