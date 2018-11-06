@@ -32,7 +32,8 @@ public class BaseProducerTest {
     }
 
     @After
-    public void after() throws IOException{
+    public void after() throws Exception{
+        Thread.sleep(1000L * 10);
         //关闭连接
         if (connection != null){
             connection.close();

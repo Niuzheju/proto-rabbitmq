@@ -3,6 +3,7 @@ package com.baidu.send_message;
 import com.baidu.BaseProducerTest;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.MessageProperties;
+import com.rabbitmq.client.impl.AMQBasicProperties;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -75,6 +76,34 @@ public class ProducerTestSendMessage extends BaseProducerTest {
         channel.queueDeclare(queue001, false, false, true, null);
         channel.queueBind(queue001, exchange_topic, "*.niuzj.#");
         channel.basicPublish(exchange_topic, "com.niuzj.test", null, "hello world".getBytes());
+    }
+
+    /**
+     * mandatory参数和immediate参数
+     * mandatory为true时
+     * 没有投递到队列的消息会被退回
+     * 使用addReturnListener方法添加监听器, 处理退回消息
+     * immediate为true时
+     * 如果消息投递到的队列没有消费者连接, 那么消息将不会投递到该队列,
+     * 如果匹配的队列都没有消费者消息将会退回, 使用addReturnListener方法处理退回消息
+     * 3.0版本后immediate已不支持, 使用会出现ForgivingExceptionHandler抛出的异常
+     * 在服务器的$RABBITMQ_HOME/var/log/rabbitmq/rabbit@localhost.log中也会有错误日志
+     */
+    @Test
+    public void test07() throws IOException {
+        /*
+            replyCode: 消息退回状态码
+            replyText: 消息退回描述
+            exchange: 交换器
+            routingKey: 路由键
+            properties: 设置的参数
+            body: 退回消息
+         */
+        channel.addReturnListener((replyCode, replyText, exchange, routingKey, properties, body) -> {
+            System.out.println("return message " + new String(body));
+        });
+        channel.basicPublish("exchange", "routingKey", false,  true, MessageProperties.TEXT_PLAIN, "test mandatory".getBytes());
 
     }
+
 }
