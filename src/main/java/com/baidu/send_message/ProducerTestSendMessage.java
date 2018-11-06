@@ -26,7 +26,7 @@ public class ProducerTestSendMessage extends BaseProducerTest {
      */
     @Test
     public void test02() throws IOException {
-        channel.basicPublish("exchange", "routingKey", true, MessageProperties.PERSISTENT_TEXT_PLAIN, "message".getBytes());
+        channel.basicPublish("exchange", "routingKey",  MessageProperties.PERSISTENT_TEXT_PLAIN, "message".getBytes());
     }
 
     /**
@@ -45,7 +45,7 @@ public class ProducerTestSendMessage extends BaseProducerTest {
     @Test
     public void test04() throws IOException {
         Map<String, Object> map = new HashMap<>();
-        map.put("localtion", "here");
+        map.put("location", "here");
         map.put("time", "today");
         channel.basicPublish("exchange", "routingKey"
                 , new AMQP.BasicProperties().builder().headers(map).build()

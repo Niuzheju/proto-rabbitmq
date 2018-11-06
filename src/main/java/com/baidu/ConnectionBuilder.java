@@ -30,8 +30,7 @@ public class ConnectionBuilder {
 
     public Connection getConnection() {
         try {
-            Connection connection = factory.newConnection();
-            return connection;
+            return factory.newConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }

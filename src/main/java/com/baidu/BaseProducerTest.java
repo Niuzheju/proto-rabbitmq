@@ -24,7 +24,7 @@ public class BaseProducerTest {
         connection = new ConnectionBuilder().getConnection();
         channel = connection.createChannel();
         //声明direct类型的交换器
-        channel.exchangeDeclare("exchange", "direct", false, true, null);
+        channel.exchangeDeclare("exchange", ExchangeConstant.DIRECT, false, true, null);
         //声明队列
         channel.queueDeclare("queue", false, false, false, null);
         //队列和交换器使用路由键绑定,direct类型路由键必须完全匹配才能发送到队列

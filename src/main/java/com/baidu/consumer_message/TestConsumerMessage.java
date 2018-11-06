@@ -59,25 +59,19 @@ public class TestConsumerMessage extends BaseConsumerTest {
      * handleDelivery方法,由多线程调用,如果想阻止持续订阅,需要在第一次消费之后取消订阅
      */
     @Test
-    public void test03() throws IOException {
+    public void test03() throws IOException, InterruptedException {
         boolean autoAck = false;
+        //消费者订阅了一个队列后,就不能再声明一个队列, 必须先取消订阅, 并将信道置为传输
         channel.basicConsume("queue", autoAck, "consumerTag", new DefaultConsumer(channel) {
             private int count;
 
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 ++count;
-                if (count == 1) {
-                    System.out.println("routingKey:" + envelope.getRoutingKey());
-                    System.out.println("contentType:" + properties.getContentType());
-                    System.out.println(new String(body));
-                    //手动确认消费
-                    channel.basicAck(envelope.getDeliveryTag(), false);
-                    //取消订阅
-//                    channel.basicCancel(consumerTag);
-                } else {
-                    //拒绝消息, requeue 是否把消息继续保存在队列
-                    channel.basicReject(envelope.getDeliveryTag(), true);
+                System.out.println(new String(body) + ", count=" + count + ",tag=" + consumerTag);
+                //count=100时把之前的消息全部拒绝
+                if (count == 100){
+                    channel.basicNack(envelope.getDeliveryTag(), true, true);
                 }
             }
 
@@ -85,20 +79,24 @@ public class TestConsumerMessage extends BaseConsumerTest {
             @Override
             public void handleConsumeOk(String consumerTag) {
                 System.out.println("消费成功-->" + consumerTag);
+                super.handleConsumeOk(consumerTag);
             }
 
             @Override
             public void handleCancelOk(String consumerTag) {
                 System.out.println("取消订阅成功-->" + consumerTag);
+                super.handleCancelOk(consumerTag);
             }
 
             @Override
             public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
                 System.out.println("连接已关闭-->" + consumerTag);
+                super.handleShutdownSignal(consumerTag, sig);
             }
         });
 
-        System.in.read();
+
+        Thread.sleep(1000L * 20);
     }
 
 }

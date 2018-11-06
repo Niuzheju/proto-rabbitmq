@@ -21,6 +21,20 @@ public class BaseConsumerTest {
     public void before() throws IOException {
         connection = new ConnectionBuilder().getConnection();
         channel = connection.createChannel();
+
+        //监听channel关闭
+        channel.addShutdownListener((cause) -> {
+            System.out.println(cause.getMessage());
+            System.out.println(cause.getReason());
+        });
+
+        //监听连接关闭
+        connection.addShutdownListener((cause) -> {
+            System.out.println(connection.isOpen());
+            System.out.println("连接关闭");
+            System.out.println(cause.getMessage());
+            System.out.println(cause.getReason());
+        });
     }
 
     //测试结束关闭连接
