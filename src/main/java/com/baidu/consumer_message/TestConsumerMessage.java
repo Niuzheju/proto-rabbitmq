@@ -23,24 +23,19 @@ public class TestConsumerMessage extends BaseConsumerTest {
          * consumerTag:唯一的消费者标签
          * callback:回调函数
          */
-        channel.basicConsume("queue", autoAck, "consumerTag", new DefaultConsumer(channel) {
+        channel.basicConsume("priority-queue", autoAck, "consumerTag", new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-//                System.out.println("routingKey:" + envelope.getRoutingKey());
-//                System.out.println("contentType:" + properties.getContentType());
+                System.out.println(new String(body));
                 try {
-                    Thread.sleep(1000L);
+                    Thread.sleep(5000L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println(new String(body));
                 //手动确认消费
                 channel.basicAck(envelope.getDeliveryTag(), false);
-//                channel.basicCancel(consumerTag);
             }
         });
-
-        System.in.read();
     }
 
     /**

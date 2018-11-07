@@ -41,6 +41,7 @@ public class BaseConsumerTest {
     @After
     public void after(){
         try {
+            Thread.sleep(Long.MAX_VALUE);
             connection.close();
         } catch (Exception e) {
             e.printStackTrace();

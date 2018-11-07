@@ -1,12 +1,8 @@
 package com.baidu;
 
-import com.rabbitmq.client.Channel;
+import com.baidu.model.constants.Constants;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  *rabbitmq连接工厂类

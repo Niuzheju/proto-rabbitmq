@@ -1,4 +1,4 @@
-package com.baidu;
+package com.baidu.model.constants;
 
 public interface ExchangeConstant {
     String FANOUT = "fanout";

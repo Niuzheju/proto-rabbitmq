@@ -1,12 +1,10 @@
 package com.baidu;
 
+import com.baidu.model.constants.ExchangeConstant;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.junit.After;
 import org.junit.Before;
-
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * 发送者测试base类
@@ -38,5 +36,9 @@ public class BaseProducerTest {
         if (connection != null){
             connection.close();
         }
+    }
+
+    protected void printSuccess(){
+        System.out.println("操作成功");
     }
 }
