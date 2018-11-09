@@ -17,6 +17,12 @@ public class BaseProducerTest {
     //信道
     protected Channel channel;
 
+    protected String exchange = "exchange";
+
+    protected String queue = "queue";
+
+    protected String route = "routingKey";
+
     @Before
     public void before() throws Exception {
         connection = new ConnectionBuilder().getConnection();

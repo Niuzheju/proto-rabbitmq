@@ -3,13 +3,13 @@ package com.baidu.send_message;
 import com.baidu.BaseProducerTest;
 import com.baidu.model.constants.ExchangeConstant;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.ConfirmListener;
 import com.rabbitmq.client.MessageProperties;
 import com.rabbitmq.client.impl.AMQBasicProperties;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ProducerTestSendMessage extends BaseProducerTest {
 
@@ -229,6 +229,125 @@ public class ProducerTestSendMessage extends BaseProducerTest {
         channel.basicPublish(exchangeTest, priority
                 , new AMQP.BasicProperties.Builder().priority(10).build(), "priority-4".getBytes());
         printSuccess();
+    }
+
+    /**
+     * 生产者确认-事务机制
+     */
+    @Test
+    public void test14() throws IOException {
+        //将信道设为事务模式
+        channel.txSelect();
+        try {
+            channel.basicPublish(exchange, route, MessageProperties.TEXT_PLAIN, "message".getBytes());
+            int i = 10 / 0;
+            //提交
+            channel.txCommit();
+        } catch (Exception e) {
+            //回滚
+            channel.txRollback();
+            e.printStackTrace();
+        }
+        printSuccess();
+    }
+
+    /**
+     * 生产者确认-单个confirm方式
+     */
+    @Test
+    public void test15() throws Exception {
+        //开启生产者确认方式, 和事务机制互斥
+        channel.confirmSelect();
+        channel.basicPublish(exchange, route, MessageProperties.TEXT_PLAIN, "message".getBytes());
+        //等待服务器确认, 此处会阻塞, 返回true证明保存成功
+        if (!channel.waitForConfirms()) {
+            //失败, 重新发送
+            channel.basicPublish(exchange, route, MessageProperties.TEXT_PLAIN, "message".getBytes());
+        }
+        printSuccess();
+    }
+
+
+    /**
+     * 生产者确认-批量confirm方式
+     */
+    @Test
+    public void test16() throws Exception {
+        channel.confirmSelect();
+        int batchCount = 10;
+        int count = 0;
+        List<String> list = new ArrayList<>(20);
+        while (true) {
+            String msg = "message" + (++count);
+            //把消息存起来
+            list.add(msg);
+            channel.basicPublish(exchange, route, MessageProperties.TEXT_PLAIN, (msg).getBytes());
+            //每10次确认
+            if (count == batchCount) {
+                System.out.println("发起确认");
+                if (!channel.waitForConfirms(1000L)) {
+                    System.out.println("重新发送消息");
+                    //失败, 重发所有消息
+                    for (String s : list) {
+                        channel.basicPublish(exchange, route, MessageProperties.TEXT_PLAIN, s.getBytes());
+                    }
+                    list.clear();
+                } else {
+                    //成功, 清空list
+                    list.clear();
+                }
+                count = 0;
+            }
+        }
+    }
+
+    /**
+     * 生产者确认-异步confirm回调方式
+     */
+    @Test
+    public void test17() throws IOException {
+        int i = 100;
+        SortedSet<Long> confirmSet = new TreeSet<>();
+        channel.confirmSelect();
+        channel.addConfirmListener(new ConfirmListener() {
+
+            //服务器确认消息时回调
+            @Override
+            public void handleAck(long deliveryTag, boolean multiple) throws IOException {
+                if (multiple) {
+                    System.out.println(deliveryTag);
+                    //如果是最后一个,则全部清空
+                    if (confirmSet.last().equals(deliveryTag)) {
+                        confirmSet.clear();
+                    } else {
+                        //删除本条消息之前的数据
+                        confirmSet.headSet(deliveryTag).clear();
+                    }
+                    System.out.println(confirmSet);
+                } else {
+                    confirmSet.remove(deliveryTag);
+                }
+            }
+
+            //服务器拒绝消息时回调
+            @Override
+            public void handleNack(long deliveryTag, boolean multiple) throws IOException {
+                if (multiple) {
+                    confirmSet.headSet(deliveryTag).clear();
+                } else {
+                    confirmSet.remove(deliveryTag);
+                }
+                //重新发送
+            }
+        });
+
+        while (i-- > 0) {
+            //生产者确认模式下, 获取下一个消息的deliveryTag
+            long deliveryTag = channel.getNextPublishSeqNo();
+            channel.basicPublish(exchange, route, MessageProperties.TEXT_PLAIN, "test confirm".getBytes());
+            //把deliveryTag添加到集合中
+            confirmSet.add(deliveryTag);
+        }
 
     }
 
