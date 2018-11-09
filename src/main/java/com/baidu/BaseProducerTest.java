@@ -30,14 +30,14 @@ public class BaseProducerTest {
         //声明direct类型的交换器
         channel.exchangeDeclare("exchange", ExchangeConstant.DIRECT, false, true, null);
         //声明队列
-        channel.queueDeclare("queue", false, false, false, null);
+        channel.queueDeclare("queue", false, false, true, null);
         //队列和交换器使用路由键绑定,direct类型路由键必须完全匹配才能发送到队列
         channel.queueBind("queue", "exchange", "routingKey");
     }
 
     @After
     public void after() throws Exception{
-        Thread.sleep(1000L * 10);
+        Thread.sleep(1000L * 6);
         //关闭连接
         if (connection != null){
             connection.close();
