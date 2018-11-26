@@ -1,5 +1,6 @@
-package com.baidu;
+package com.baidu.utils;
 
+import com.baidu.ConnectionBuilder;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 

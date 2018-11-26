@@ -1,0 +1,385 @@
+{
+  "rabbit_version": "3.6.12",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "/EIwB98LF/F8rBBfoUuyDcaYcIw1YUDN/mA0RAAuUUp9jB7P",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    },
+    {
+      "name": "nzj",
+      "password_hash": "qAX5oHVN9D/Fo/NSBi5qiEYtDTSEzREmpMc3RzWudSO6FGh5",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "monitoring"
+    },
+    {
+      "name": "root",
+      "password_hash": "JkyeN/FZsV/KBr6GpFA68HiEqDSBcyKhOKAkaT37yj623nuT",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/vhost1"
+    },
+    {
+      "name": "/"
+    },
+    {
+      "name": "/vhost2"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "nzj",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "root",
+      "vhost": "/vhost2",
+      "configure": "^queue.*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "root",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "parameters": [
+    {
+      "value": {
+        "uri": "amqp://root:root@192.168.70.80:5672",
+        "ack-mode": "on-confirm"
+      },
+      "vhost": "/",
+      "component": "federation-upstream",
+      "name": "j1"
+    },
+    {
+      "value": {
+        "uri": "amqp://root:root@192.168.70.80:5672",
+        "ack-mode": "on-confirm"
+      },
+      "vhost": "/",
+      "component": "federation-upstream",
+      "name": "f2"
+    },
+    {
+      "value": {
+        "uri": "amqp://root:root@192.168.70.80:5672",
+        "ack-mode": "on-confirm"
+      },
+      "vhost": "/",
+      "component": "federation-upstream",
+      "name": "d1"
+    }
+  ],
+  "global_parameters": [
+    {
+      "name": "cluster_name",
+      "value": "cluster"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "p1",
+      "pattern": "^amq.",
+      "apply-to": "exchanges",
+      "definition": {
+        "federation-upstream": "f2"
+      },
+      "priority": 1
+    }
+  ],
+  "queues": [
+    {
+      "name": "queue_5s",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx_5s",
+        "x-message-ttl": 5000
+      }
+    },
+    {
+      "name": "queue_10s",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx_10s",
+        "x-message-ttl": 10000
+      }
+    },
+    {
+      "name": "queue_delay_1min",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: amq.match -> cluster",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "queue_1min",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx_1min",
+        "x-message-ttl": 60000
+      }
+    },
+    {
+      "name": "federation: amq.fanout -> cluster",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "queue_delay_10s",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: amq.direct -> cluster",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "queue_delay_5s",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: amq.headers -> cluster",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "federation: amq.topic -> cluster",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "queue_30s",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx_30s",
+        "x-message-ttl": 30000
+      }
+    },
+    {
+      "name": "queue_delay_30s",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "federation: amq.direct -> cluster B",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-max-hops": 1,
+        "x-downstream-name": "cluster",
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "exchange_core_delay",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: amq.topic -> cluster B",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-max-hops": 1,
+        "x-downstream-name": "cluster",
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "federation: amq.headers -> cluster B",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-max-hops": 1,
+        "x-downstream-name": "cluster",
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "federation: amq.match -> cluster B",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-max-hops": 1,
+        "x-downstream-name": "cluster",
+        "x-internal-purpose": "federation"
+      }
+    },
+    {
+      "name": "aeExchange",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "federation: amq.fanout -> cluster B",
+      "vhost": "/",
+      "type": "x-federation-upstream",
+      "durable": true,
+      "auto_delete": true,
+      "internal": true,
+      "arguments": {
+        "x-max-hops": 1,
+        "x-downstream-name": "cluster",
+        "x-internal-purpose": "federation"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "exchange_core_delay",
+      "vhost": "/",
+      "destination": "queue_10s",
+      "destination_type": "queue",
+      "routing_key": "10s",
+      "arguments": {}
+    },
+    {
+      "source": "exchange_core_delay",
+      "vhost": "/",
+      "destination": "queue_1min",
+      "destination_type": "queue",
+      "routing_key": "1min",
+      "arguments": {}
+    },
+    {
+      "source": "exchange_core_delay",
+      "vhost": "/",
+      "destination": "queue_30s",
+      "destination_type": "queue",
+      "routing_key": "30s",
+      "arguments": {}
+    },
+    {
+      "source": "exchange_core_delay",
+      "vhost": "/",
+      "destination": "queue_5s",
+      "destination_type": "queue",
+      "routing_key": "5s",
+      "arguments": {}
+    },
+    {
+      "source": "federation: amq.direct -> cluster B",
+      "vhost": "/",
+      "destination": "federation: amq.direct -> cluster",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "federation: amq.fanout -> cluster B",
+      "vhost": "/",
+      "destination": "federation: amq.fanout -> cluster",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "federation: amq.headers -> cluster B",
+      "vhost": "/",
+      "destination": "federation: amq.headers -> cluster",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "federation: amq.match -> cluster B",
+      "vhost": "/",
+      "destination": "federation: amq.match -> cluster",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "federation: amq.topic -> cluster B",
+      "vhost": "/",
+      "destination": "federation: amq.topic -> cluster",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    }
+  ]
+}

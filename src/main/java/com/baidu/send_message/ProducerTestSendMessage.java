@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 public class ProducerTestSendMessage extends BaseProducerTest {
 
@@ -21,6 +22,7 @@ public class ProducerTestSendMessage extends BaseProducerTest {
         for (int i = 0; i < 100; i++) {
             channel.basicPublish("exchange", "routingKey", null, (i + "message").getBytes());
         }
+        new CountDownLatch(1).await();
     }
 
     /**

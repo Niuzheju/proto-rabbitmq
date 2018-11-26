@@ -5,6 +5,7 @@ import com.rabbitmq.client.*;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 public class TestConsumerMessage extends BaseConsumerTest {
 
@@ -13,7 +14,7 @@ public class TestConsumerMessage extends BaseConsumerTest {
      * 持续性订阅,channel和connection关闭之前会一直消费队列上的消息
      */
     @Test
-    public void test01() throws IOException {
+    public void test01() throws IOException, InterruptedException {
         boolean autoAck = false;
         //最大接收消息个数
         channel.basicQos(64);
@@ -23,7 +24,7 @@ public class TestConsumerMessage extends BaseConsumerTest {
          * consumerTag:唯一的消费者标签
          * callback:回调函数
          */
-        channel.basicConsume("priority-queue", autoAck, "consumerTag", new DefaultConsumer(channel) {
+        channel.basicConsume("queue", autoAck, "consumerTag", new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 System.out.println(new String(body));
@@ -36,6 +37,8 @@ public class TestConsumerMessage extends BaseConsumerTest {
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
         });
+
+        new CountDownLatch(1).await();
     }
 
     /**
